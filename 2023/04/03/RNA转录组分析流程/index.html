@@ -1,0 +1,181 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><title>RNA转录组分析流程 | WeiiYA</title><meta name="author" content="weiiya"><meta name="copyright" content="weiiya"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="1 MAPPING第一步，拿RNA测序文件进行比对，在这里我们使用hisat2。在水稻中，我们主要是利用日本晴数据库（http:&#x2F;&#x2F;rice.uga.edu&#x2F;pub&#x2F;data&#x2F;Eukaryotic_Projects&#x2F;o_sativa&#x2F;annotation_dbs&#x2F;pseudomolecules&#x2F;version_7.0&#x2F;all.dir&#x2F;） 作为参考基因组。下载蛋白pep，基因gff3&#x2F;gt">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RNA转录组分析流程">
+<meta property="og:url" content="http://example.com/2023/04/03/RNA%E8%BD%AC%E5%BD%95%E7%BB%84%E5%88%86%E6%9E%90%E6%B5%81%E7%A8%8B/index.html">
+<meta property="og:site_name" content="WeiiYA">
+<meta property="og:description" content="1 MAPPING第一步，拿RNA测序文件进行比对，在这里我们使用hisat2。在水稻中，我们主要是利用日本晴数据库（http:&#x2F;&#x2F;rice.uga.edu&#x2F;pub&#x2F;data&#x2F;Eukaryotic_Projects&#x2F;o_sativa&#x2F;annotation_dbs&#x2F;pseudomolecules&#x2F;version_7.0&#x2F;all.dir&#x2F;） 作为参考基因组。下载蛋白pep，基因gff3&#x2F;gt">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/iTab-cn3_yhwHmC8.webp">
+<meta property="article:published_time" content="2023-04-02T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-04-05T11:04:15.955Z">
+<meta property="article:author" content="weiiya">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/iTab-cn3_yhwHmC8.webp"><link rel="shortcut icon" href="/./img/%E6%9C%AA%E6%A0%87%E9%A2%98-1.png"><link rel="canonical" href="http://example.com/2023/04/03/RNA%E8%BD%AC%E5%BD%95%E7%BB%84%E5%88%86%E6%9E%90%E6%B5%81%E7%A8%8B/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  }
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'RNA转录组分析流程',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-04-05 19:04:15'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 5.4.2"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/./img/166973.webp" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">2</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/./img/iTab-cn3_yhwHmC8.webp')"><nav id="nav"><span id="blog-info"><a href="/" title="WeiiYA"><span class="site-name">WeiiYA</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">RNA转录组分析流程</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-04-02T16:00:00.000Z" title="发表于 2023-04-03 00:00:00">2023-04-03</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-04-05T11:04:15.955Z" title="更新于 2023-04-05 19:04:15">2023-04-05</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">951</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>4分钟</span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="1-MAPPING"><a href="#1-MAPPING" class="headerlink" title="1 MAPPING"></a>1 MAPPING</h1><p>第一步，拿RNA测序文件进行比对，在这里我们使用hisat2。<br>在水稻中，我们主要是利用日本晴数据库（<a target="_blank" rel="noopener" href="http://rice.uga.edu/pub/data/Eukaryotic_Projects/o_sativa/annotation_dbs/pseudomolecules/version_7.0/all.dir/%EF%BC%89">http://rice.uga.edu/pub/data/Eukaryotic_Projects/o_sativa/annotation_dbs/pseudomolecules/version_7.0/all.dir/）</a> 作为参考基因组。<br>下载蛋白pep，基因gff3&#x2F;gtf，基因组文件。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">hisat2 --new-summary -p 10 -x ../refricedata/all.con -1 ../DATA/KIT-1/CRR330984_f1.fq.gz -2 ../DATA/KIT-1/CRR330984_r2.fq.gz -S KIT-1.sam</span><br><span class="line">hisat2 --new-summary -p 10 -x ../refricedata/all.con -1 ../DATA/Kit-2/CRR330985_f1.fq.gz -2 ../DATA/Kit-2/CRR330985_r2.fq.gz -S KTI-2.sam</span><br><span class="line">hisat2 --new-summary -p 10 -x ../refricedata/all.con -1 ../DATA/Kit-P-1/CRR330986_f1.fq.gz -2 ../DATA/Kit-P-1/CRR330986_r2.fq.gz -S Kit-P-1.sam</span><br><span class="line">hisat2 --new-summary -p 10 -x ../refricedata/all.con -1 ../DATA/Kit-P-2/CRR330987_f1.fq.gz -2 ../DATA/Kit-P-2/CRR330987_r2.fq.gz -S Kit-P-2.sam</span><br><span class="line">hisat2 --new-summary -p 10 -x ../refricedata/all.con -1 ../DATA/LTH-1/CRR330988_f1.fq.gz -2 ../DATA/LTH-1/CRR330988_r2.fq.gz -S LTH-1.sam</span><br><span class="line">hisat2 --new-summary -p 10 -x ../refricedata/all.con -1 ../DATA/LTH-2/CRR330989_f1.fq.gz -2 ../DATA/LTH-2/CRR330989_r2.fq.gz -S LTH-2.sam</span><br><span class="line">hisat2 --new-summary -p 10 -x ../refricedata/all.con -1 ../DATA/LTH-P-1/CRR330990_f1.fq.gz -2 ../DATA/LTH-P-1/CRR330990_r2.fq.gz -S LTH-P-1.sam</span><br><span class="line">hisat2 --new-summary -p 10 -x ../refricedata/all.con -1 ../DATA/LTH-P-2/CRR330991_f1.fq.gz -2 ../DATA/LTH-P-2/CRR330991_r2.fq.gz -S LTH-P-2.sam</span><br></pre></td></tr></table></figure>
+
+<p>比对之后，我们查看比对率，越高越高。同时下一步，对sam文件进行排序和转换格式。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">samtools sort -o KIT-1.bam KIT-1.sam</span><br><span class="line">samtools sort -o KTI-2.bam KTI-2.sam</span><br><span class="line">samtools sort -o Kit-P-1.bam Kit-P-1.sam</span><br><span class="line">samtools sort -o Kit-P-2.bam Kit-P-2.sam</span><br><span class="line">samtools sort -o LTH-1.bam LTH-1.sam</span><br><span class="line">samtools sort -o LTH-2.bam LTH-2.sam</span><br><span class="line">samtools sort -o LTH-P-1.bam LTH-P-1.sam</span><br><span class="line">samtools sort -o LTH-P-2.bam LTH-P-2.sam</span><br></pre></td></tr></table></figure>
+
+<p>这一步之后我们得到了bam文件，并对其进行索引。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">samtools index KIT-1.bam</span><br><span class="line">samtools index KTI-2.bam</span><br><span class="line">samtools index Kit-P-1.bam</span><br><span class="line">samtools index Kit-P-2.bam</span><br><span class="line">samtools index LTH-1.bam</span><br><span class="line">samtools index LTH-2.bam</span><br><span class="line">samtools index LTH-P-1.bam</span><br><span class="line">samtools index LTH-P-2.bam</span><br></pre></td></tr></table></figure>
+<h1 id="2-定量"><a href="#2-定量" class="headerlink" title="2 定量"></a>2 定量</h1><p>这一步，我们利用了featurecounts-R包进行表达矩阵的制作。原理：在bam文件中，找出每条reads在基因中的比对次数。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Rscript ./run-featurecounts.R --bam ../mappingncbi/KIT-1.bam --gtf ../refricedata/all.gtf  --output ./KIT-1_counts</span><br><span class="line">Rscript ./run-featurecounts.R --bam ../mappingncbi/KTI-2.bam --gtf ../refricedata/all.gtf --output ./KTI-2_counts</span><br><span class="line">Rscript ./run-featurecounts.R --bam ../mappingncbi/Kit-P-1.bam --gtf ../refricedata/all.gtf --output ./Kit-P-1_counts</span><br><span class="line">Rscript ./run-featurecounts.R --bam ../mappingncbi/Kit-P-2.bam --gtf ../refricedata/all.gtf --output ./Kit-P-2_counts</span><br><span class="line">Rscript ./run-featurecounts.R --bam ../mappingncbi/LTH-1.bam --gtf ../refricedata/all.gtf --output ./LTH-1_counts</span><br><span class="line">Rscript ./run-featurecounts.R --bam ../mappingncbi/LTH-2.bam --gtf ../refricedata/all.gtf --output ./LTH-2_counts</span><br><span class="line">Rscript ./run-featurecounts.R --bam ../mappingncbi/LTH-P-1.bam --gtf ../refricedata/all.gtf --output ./LTH-P-1_counts</span><br><span class="line">Rscript ./run-featurecounts.R --bam ../mappingncbi/LTH-P-2.bam --gtf ../refricedata/all.gtf --output ./LTH-P-2_counts</span><br></pre></td></tr></table></figure>
+<h1 id="3-找出差异基因"><a href="#3-找出差异基因" class="headerlink" title="3 找出差异基因"></a>3 找出差异基因</h1><p>第三步我们就需要利用了Trinity中的一个pl脚本，run_DE_analsis.pl。<br>我们最多的是使用DEseq2对表达矩阵进行基因是否为差异基因的评判，得到???.count文件。<br>到这一步，我们就可以利用差异基因的标准对其进行分析，从而找出差异基因。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">perl /public/home/wyang/miniconda3/envs/deseq/opt/trinity-2.1.1/Analysis/DifferentialExpression/run_DE_analysis.pl --matrix genes.counts.matrix --method DESeq2 --samples_file sample.txt --contrasts constrat.txt</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>R语音进行数据处理。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"># 差异表达基因的火山图和热图</span><br><span class="line"></span><br><span class="line">## 准备数据</span><br><span class="line"></span><br><span class="line">### 表达矩阵</span><br><span class="line">library(readr)</span><br><span class="line">genes_exp &lt;- read_delim(&quot;genes.counts.matrix&quot;, </span><br><span class="line">                           delim = &quot;\t&quot;, escape_double = FALSE, </span><br><span class="line">                           trim_ws = TRUE)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">### 样本信息表</span><br><span class="line">sample_info &lt;- read.table(file = &quot;sample.txt&quot;, </span><br><span class="line">                          header = TRUE,</span><br><span class="line">                          row.names = 1)</span><br><span class="line"></span><br><span class="line">### 差异分析结果</span><br><span class="line">library(readr)</span><br><span class="line">de_results &lt;- read_delim(&quot;genes.counts.matrix.LTH_vs_LTH-P.DESeq2.DE_results&quot;, </span><br><span class="line">                                                      delim = &quot;\t&quot;, escape_double = FALSE, </span><br><span class="line">                                                      trim_ws = TRUE)</span><br><span class="line"></span><br><span class="line">### 多表关联与数据整理</span><br><span class="line">tmp &lt;- select(de_results, id, log2FoldChange, pvalue, padj) %&gt;%</span><br><span class="line">  mutate(direction = if_else(abs(log2FoldChange) &lt; 1 | padj &gt; 0.05, &#x27;ns&#x27;,</span><br><span class="line">                             if_else(log2FoldChange &gt;= 1, &#x27;up&#x27;, &#x27;down&#x27;))) %&gt;%</span><br><span class="line">  left_join(genes_exp, by = c(&#x27;id&#x27; = &#x27;...1&#x27;))</span><br><span class="line"></span><br><span class="line">group_by(tmp, direction) %&gt;%</span><br><span class="line">  summarise(count=n())</span><br><span class="line"></span><br><span class="line">write.csv(tmp, file = &quot;tmp2.csv&quot;)</span><br></pre></td></tr></table></figure>
+<h1 id="5-后续的分析"><a href="#5-后续的分析" class="headerlink" title="5 后续的分析"></a>5 后续的分析</h1><p>有了DEGs，我们可以进行很多分析。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">火山图</span><br><span class="line">热图</span><br><span class="line">相关基因的筛选</span><br><span class="line">等等。</span><br></pre></td></tr></table></figure>
+
+
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="http://example.com">weiiya</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2023/04/03/RNA%E8%BD%AC%E5%BD%95%E7%BB%84%E5%88%86%E6%9E%90%E6%B5%81%E7%A8%8B/">http://example.com/2023/04/03/RNA%E8%BD%AC%E5%BD%95%E7%BB%84%E5%88%86%E6%9E%90%E6%B5%81%E7%A8%8B/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://example.com" target="_blank">WeiiYA</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="/./img/iTab-cn3_yhwHmC8.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-full"><a href="/2023/04/05/funannotate/" title="funannotate的安装记录"><div class="cover" style="background: ./img/iTab-cn3_yhwHmC8.webpp"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">funannotate的安装记录</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/./img/166973.webp" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">weiiya</div><div class="author-info__description">WeiiYablog</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">2</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="/baidu.com" target="_blank" title="搜索"><i class="fas fa-envelope"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-MAPPING"><span class="toc-number">1.</span> <span class="toc-text">1 MAPPING</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E5%AE%9A%E9%87%8F"><span class="toc-number">2.</span> <span class="toc-text">2 定量</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E6%89%BE%E5%87%BA%E5%B7%AE%E5%BC%82%E5%9F%BA%E5%9B%A0"><span class="toc-number">3.</span> <span class="toc-text">3 找出差异基因</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-%E5%90%8E%E7%BB%AD%E7%9A%84%E5%88%86%E6%9E%90"><span class="toc-number">4.</span> <span class="toc-text">5 后续的分析</span></a></li></ol></div></div></div></div></main><footer id="footer" style="background-image: url('/./img/iTab-cn3_yhwHmC8.webp')"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By weiiya</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"></div><script id="click-show-text" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/click-show-text.min.js" data-mobile="false" data-text="YUE" data-fontsize="15px" data-random="false" async="async"></script></div></body></html>
